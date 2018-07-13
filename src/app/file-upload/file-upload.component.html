@@ -1,0 +1,24 @@
+
+
+<div style="margin: 50px">
+
+
+  <div *ngIf="picked">
+    File:
+    <strong>{{picked.name}}</strong>
+    <br> {{picked.size}} bytes
+
+
+    <p>
+      {{picked.content}}
+    </p>
+
+  </div>
+
+  <button type="button" mat-button
+          [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
+          (filePick)="onFilePicked($event)"
+          (readEnd)="onReadEnd($event)">Browse</button>
+
+
+</div>
