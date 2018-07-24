@@ -2,6 +2,9 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import { FilePickerDirective, ReadFile, ReadMode } from 'ngx-file-helpers';
 
 import * as XLSX from 'xlsx';
+import {DataService} from '../data.service';
+const Parse: any = require('parse');
+
 
 
 @Component({
@@ -11,13 +14,24 @@ import * as XLSX from 'xlsx';
 })
 export class FileUploadComponent implements OnInit {
 
-  public readMode = ReadMode.dataURL;
+  public readMode = ReadMode.binaryString;
   public picked: ReadFile;
   public status: string;
+  public accepted = false;
+
+  employees = [];
 
   @ViewChild(FilePickerDirective)  private filePicker;
 
-  ngOnInit() {}
+  constructor(private dataService: DataService) { }
+
+  ngOnInit() {
+
+    this.employees = this.dataService.getEmployees();
+
+    // console.log(this.employees);
+
+  }
 
   onReadStart(fileCount: number) {
     this.status = `Reading ${fileCount} file(s)...`;
@@ -25,38 +39,51 @@ export class FileUploadComponent implements OnInit {
 
   onFilePicked(file: ReadFile) {
 
-
     this.picked = file;
 
-    const wb = XLSX.readFile(this.picked.name);
-
-    const workbook = XLSX.read(file.content,  {type: 'base64'});
+    const workbook = XLSX.read(file.content,  {type: 'binary'});
 
     const first_sheet_name = workbook.SheetNames[0];
-    //
 
-    //
-     const  worksheet = workbook.Sheets[first_sheet_name];
-    // console.log(JSON.stringify(worksheet.A1.v));
-
-     //
-    // const jsonData = XLSX.utils;
-    //
+    const  worksheet = workbook.Sheets[first_sheet_name];
 
 
-    // console.log(jsonData);
-    //
-    // const desired_cell = worksheet[address_of_cell];
-    //
-    // const a = XLSX.utils.decode_cell(desired_cell);
-    //
-    //
-    // const desired_value = (desired_cell ? desired_cell.v : undefined);
-    //
-    //
-    // this.handleFile(this.picked.name);
+    const a = Object.values(worksheet);
 
+    // console.log(worksheet['!ref']);
+    // console.log(worksheet['!rows']);
 
+    // console.log('employee');
+
+    // console.log(Object.values(worksheet).findIndex(w => w.v === 'keyWord'));
+    // console.log(this.findKeywordIndex('employee', worksheet));
+
+    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'E105D')));
+    //
+    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'E556855')));
+    //
+    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'YBHB566555')));
+
+    console.log('date');
+    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'date')));
+
+    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2018NOV25')));
+    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2018FEB28')));
+    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2017MAR24')));
+    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2016JUN21')));
+    // console.log(Object.values(worksheet).findIndex(w => w.v === 'date'));
+    //
+    // console.log('project');
+    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'project')));
+    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'FP456')));
+
+    //
+    // Object.values(worksheet).map((w) => {
+    //   console.log(w);
+    //
+    // });
+
+    // console.log(worksheet);
 
 
   }
@@ -66,62 +93,15 @@ export class FileUploadComponent implements OnInit {
     this.filePicker.reset();
   }
 
-  handleFile(e) {
+  findKeywordIndex(keyWord: string, worksheet: object): number {
 
-    const rABS = true;
+    const i = Object.values(worksheet).findIndex(w => w.v === keyWord);
 
-    const files = e.target.files, f = files[0];
-    const reader = new FileReader();
-
-    reader.onload = (ev => {
-
-      let data = e.target.result;
-
-      if (!rABS) {
-        data = new Uint8Array(data);
-
-        const workbook = XLSX.read(data, {type: rABS ? 'array' : 'array'});
-      }
-
-    });
-
-
-    if (rABS) {
-      reader.readAsBinaryString(f);
-    } else {
-      reader.readAsArrayBuffer(f);
-    }
-
+    return i;
 
   }
 
-  // handleFile(e) {
-  //
-  //   const rABS = true;
-  //
-  //   const files = e.target.files, f = files[0];
-  //   const reader = new FileReader();
-  //
-  //   reader.onload = (ev => {
-  //
-  //     let data = e.target.result;
-  //
-  //     if (!rABS) {
-  //       data = new Uint8Array(data);
-  //
-  //       const workbook = XLSX.read(data, {type: rABS ? 'array' : 'array'});
-  //     }
-  //
-  //   });
-  //
-  //
-  //   if (rABS) {
-  //     reader.readAsBinaryString(f);
-  //   } else {
-  //     reader.readAsArrayBuffer(f);
-  //   }
-  //
-  //
-  // }
+
+
 
 }

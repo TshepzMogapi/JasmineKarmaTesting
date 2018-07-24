@@ -3,22 +3,41 @@
 <div style="margin: 50px">
 
 
-  <div *ngIf="picked">
-    File:
-    <strong>{{picked.name}}</strong>
-    <br> {{picked.size}} bytes
+  <table>
 
+    <tr>
+      <th>DATE</th>
+      <th>Employee</th>
+      <th>Project</th>
 
-    <p>
-      {{picked.content}}
-    </p>
+    </tr>
 
+  </table>
+
+  <input type="checkbox" [checked]="accepted" (change)="accepted = !accepted">
+
+ <div>
+
+   Select Work Sheet
+
+ </div>
+
+</div>
+
+<div class="row">
+
+  <div class="col-sm-4">
+    <div class="mb-2">
+      <progressbar [value]="55"></progressbar>
+    </div>
   </div>
 
-  <button type="button" mat-button
-          [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
-          (filePick)="onFilePicked($event)"
-          (readEnd)="onReadEnd($event)">Browse</button>
+  <button
 
+    style="margin-top: 50px;margin-left: 50px"
+    type="button" mat-button
+    [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
+    (filePick)="onFilePicked($event)"
+    (readEnd)="onReadEnd($event)"> Upload </button>
 
 </div>
