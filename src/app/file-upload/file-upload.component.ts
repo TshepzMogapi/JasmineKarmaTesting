@@ -53,41 +53,25 @@ export class FileUploadComponent implements OnInit {
 
     const a = Object.values(worksheet);
 
-    // console.log(worksheet['!ref']);
-    // console.log(worksheet['!rows']);
+    const dateHeaderIndex = this.findKeywordIndex('date', worksheet);
 
-    // console.log('employee');
+    const projectHeaderIndex = this.findKeywordIndex('project', worksheet);
 
-    // console.log(Object.values(worksheet).findIndex(w => w.v === 'keyWord'));
-    // console.log(this.findKeywordIndex('employee', worksheet));
+    const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
 
-    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'E105D')));
-    //
-    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'E556855')));
-    //
-    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'YBHB566555')));
+    console.log(employeeHeaderIndex);
 
-    console.log('date');
-    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'date')));
+    const dates = this.findColumnData(dateHeaderIndex, worksheet);
 
-    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2018NOV25')));
-    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2018FEB28')));
-    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2017MAR24')));
-    console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === '2016JUN21')));
-    // console.log(Object.values(worksheet).findIndex(w => w.v === 'date'));
-    //
-    // console.log('project');
-    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'project')));
-    // console.log(Object.values(worksheet).indexOf(a.find((t) => t.v === 'FP456')));
+    const projects = this.findColumnData(projectHeaderIndex, worksheet);
 
-    //
-    // Object.values(worksheet).map((w) => {
-    //   console.log(w);
-    //
-    // });
+    // const employeeNames = this.findColumnData(employeeHeaderIndex, worksheet);
 
-    // console.log(worksheet);
+    // console.log(dates);
+    // console.log(projects);
+    // console.log(employeeNames);
 
+    this.dataService.updateTimes();
 
   }
 
@@ -95,7 +79,7 @@ export class FileUploadComponent implements OnInit {
     this.status = `Read ${fileCount} file(s) on ${new Date().toLocaleTimeString()}.`;
     this.filePicker.reset();
 
-    console.log(this.projects);
+    // console.log(this.projects);
   }
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
@@ -103,6 +87,21 @@ export class FileUploadComponent implements OnInit {
     const i = Object.values(worksheet).findIndex(w => w.v === keyWord);
 
     return i;
+
+  }
+
+
+  findColumnData(topIndex: number, worksheet: object): any[] {
+
+    const columnData = [];
+
+    for (let j = topIndex + 3; j <= (Object.values(worksheet).length); j += 3) {
+
+      columnData.push((Object.values(worksheet)[j].v));
+
+    }
+
+    return columnData;
 
   }
 

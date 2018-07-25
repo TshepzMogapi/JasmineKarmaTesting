@@ -94,6 +94,31 @@ export class DataService {
 
   }
 
+  updateTimes(): void {
+
+    const Time = Parse.Object.extend('Time');
+
+    const timeRecord = new Time();
+
+
+    timeRecord.set('projectId', 1023);
+    timeRecord.set('hours', 5);
+    timeRecord.set('weekStart', '2017Nov08');
+
+  timeRecord.save(null, {
+      success: function(tR) {
+        // Now let's update it with some new data. In this case, only cheatMode and score
+        // will get sent to the cloud. playerName hasn't changed.
+
+        alert('Time saved succesfully');
+
+      }
+    });
+
+
+    console.log('Update Database');
+  }
+
 
 
 }
