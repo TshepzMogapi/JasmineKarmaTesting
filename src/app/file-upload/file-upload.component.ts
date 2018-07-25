@@ -3,7 +3,6 @@ import { FilePickerDirective, ReadFile, ReadMode } from 'ngx-file-helpers';
 
 import * as XLSX from 'xlsx';
 import {DataService} from '../data.service';
-const Parse: any = require('parse');
 
 
 
@@ -27,6 +26,13 @@ export class FileUploadComponent implements OnInit {
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
+
+    const array1 = [1, 2, 3];
+
+    const array2 = [2, 3, 4, 5];
+
+
+    console.log(array1.filter(value => -1 === array2.indexOf(value)));
 
     this.employees = this.dataService.getEmployees();
 
@@ -59,19 +65,37 @@ export class FileUploadComponent implements OnInit {
 
     const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
 
-    console.log(employeeHeaderIndex);
-
     const dates = this.findColumnData(dateHeaderIndex, worksheet);
 
     const projects = this.findColumnData(projectHeaderIndex, worksheet);
 
-    // const employeeNames = this.findColumnData(employeeHeaderIndex, worksheet);
+    const distinctProjects = this.getDistinctData(projects);
 
-    // console.log(dates);
-    // console.log(projects);
-    // console.log(employeeNames);
+    // const array1 = [1, 2, 3];
+    //
+    // const array2 = [2, 3, 4, 5];
+    //
+    //
 
-    this.dataService.updateTimes();
+    const projectsNames = [];
+
+
+    this.projects.map((p) => {
+      projectsNames.push(p.name);
+    });
+
+    console.log(distinctProjects.filter(value => -1 === projectsNames.indexOf(value)));
+    //
+    //
+    //
+    // const employeeNames: any[] = this.findColumnData(employeeHeaderIndex, worksheet);
+
+    // distinctProjects.filter(value => -1 !== this.projects.indexOf(value));
+
+    // console.log(this.projects.filter(value => -1 !== distinctProjects.indexOf(value)));
+
+    // todo modify below for updating
+    // this.dataService.updateTimes();
 
   }
 
@@ -97,12 +121,24 @@ export class FileUploadComponent implements OnInit {
 
     for (let j = topIndex + 3; j <= (Object.values(worksheet).length); j += 3) {
 
-      columnData.push((Object.values(worksheet)[j].v));
+      if ((Object.values(worksheet)[j])) {
+        columnData.push((Object.values(worksheet)[j]).v);
+      }
 
     }
 
     return columnData;
 
+  }
+
+
+  getDistinctData(originalData: any[]): any[] {
+
+    let uniqueData = [];
+
+    uniqueData = Array.from(new Set(originalData));
+
+    return uniqueData;
   }
 
 
