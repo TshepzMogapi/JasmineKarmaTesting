@@ -20,34 +20,80 @@ export class DataService {
 
 
 
-
-
   getEmployees(): any[] {
 
-    const kids = [];
+    let employee = {
+      'id': null,
+      'name': ''
+    };
 
-    const Kids = Parse.Object.extend('Employee');
+    const employees = [];
 
-    const query = new Parse.Query(Kids);
+    const Employees = Parse.Object.extend('Employee');
 
-    query.select('Name');
-    query.find({
-      success: function(results) {
+    const query = new Parse.Query(Employees);
+
+    query.find().then((results) => {
 
         for (let i = 0; i < results.length; i++) {
-          console.log(results[i]);
-          kids.push(results[i]);
+
+          employee = {
+            'id': null,
+            'name': ''
+          };
+
+          employee.id = results[i].id;
+          employee.name = results[i].attributes.Name;
+
+          employees.push(employee);
+
         }
-      },
-      error: function(error) {
 
-        console.log(error);
-
-      }
     });
 
+    return employees;
 
-    return kids;
+
 
   }
+
+  getProjects(): any[] {
+
+    let project = {
+      'id': null,
+      'name': ''
+    };
+
+    const projects = [];
+
+    const Projects = Parse.Object.extend('Project');
+
+    const query = new Parse.Query(Projects);
+
+    query.find().then((results) => {
+
+      for (let i = 0; i < results.length; i++) {
+
+        project = {
+          'id': null,
+          'name': ''
+        };
+
+        project.id = results[i].id;
+        project.name = results[i].attributes.Name;
+
+        projects.push(project);
+
+      }
+
+    });
+
+    return projects;
+
+
+
+  }
+
+
+
 }

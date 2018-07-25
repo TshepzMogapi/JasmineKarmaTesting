@@ -20,6 +20,7 @@ export class FileUploadComponent implements OnInit {
   public accepted = false;
 
   employees = [];
+  projects = [];
 
   @ViewChild(FilePickerDirective)  private filePicker;
 
@@ -29,12 +30,14 @@ export class FileUploadComponent implements OnInit {
 
     this.employees = this.dataService.getEmployees();
 
-    // console.log(this.employees);
+    this.projects = this.dataService.getProjects();
 
   }
 
   onReadStart(fileCount: number) {
     this.status = `Reading ${fileCount} file(s)...`;
+
+
   }
 
   onFilePicked(file: ReadFile) {
@@ -91,6 +94,8 @@ export class FileUploadComponent implements OnInit {
   onReadEnd(fileCount: number) {
     this.status = `Read ${fileCount} file(s) on ${new Date().toLocaleTimeString()}.`;
     this.filePicker.reset();
+
+    console.log(this.projects);
   }
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
