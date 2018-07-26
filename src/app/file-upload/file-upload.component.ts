@@ -21,6 +21,8 @@ export class FileUploadComponent implements OnInit {
   employees = [];
   projects = [];
 
+  displayProjects = [];
+
   @ViewChild(FilePickerDirective)  private filePicker;
 
   constructor(private dataService: DataService) { }
@@ -32,11 +34,13 @@ export class FileUploadComponent implements OnInit {
     const array2 = [2, 3, 4, 5];
 
 
-    console.log(array1.filter(value => -1 === array2.indexOf(value)));
+    console.log(array1.includes(2));
 
     this.employees = this.dataService.getEmployees();
 
     this.projects = this.dataService.getProjects();
+
+
 
   }
 
@@ -69,12 +73,15 @@ export class FileUploadComponent implements OnInit {
 
     const projects = this.findColumnData(projectHeaderIndex, worksheet);
 
+    this.displayProjects = [];
+
     const distinctProjects = this.getDistinctData(projects);
 
-    // const array1 = [1, 2, 3];
-    //
-    // const array2 = [2, 3, 4, 5];
-    //
+    const array1 = [1, 2, 3];
+
+    const array2 = [2, 3, 4, 5];
+
+
     //
 
     const projectsNames = [];
@@ -84,8 +91,40 @@ export class FileUploadComponent implements OnInit {
       projectsNames.push(p.name);
     });
 
-    console.log(distinctProjects.filter(value => -1 === projectsNames.indexOf(value)));
-    //
+    const invalidProjects = distinctProjects.filter(value => -1 === projectsNames.indexOf(value));
+
+    console.log(invalidProjects);
+
+    projects.map((p) => {
+
+      let i = 0;
+
+
+
+      if (invalidProjects.includes(p)) {
+
+
+        this.displayProjects.push(
+          {
+            'name': p,
+            'isValid' : false
+          }
+        );
+
+      } else {
+
+        this.displayProjects.push(
+          {
+            'name': p,
+            'isValid' : true
+          }
+        );
+      }
+
+      i++;
+    });
+
+    // //
     //
     //
     // const employeeNames: any[] = this.findColumnData(employeeHeaderIndex, worksheet);
@@ -103,7 +142,6 @@ export class FileUploadComponent implements OnInit {
     this.status = `Read ${fileCount} file(s) on ${new Date().toLocaleTimeString()}.`;
     this.filePicker.reset();
 
-    // console.log(this.projects);
   }
 
   findKeywordIndex(keyWord: string, worksheet: object): number {

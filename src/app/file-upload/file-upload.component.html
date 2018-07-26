@@ -3,16 +3,16 @@
 <div style="margin: 50px">
 
 
-  <table>
+  <!--<table>-->
 
-    <tr>
-      <th>DATE</th>
-      <th>Employee</th>
-      <th>Project</th>
+    <!--<tr>-->
+      <!--<th>DATE</th>-->
+      <!--<th>Employee</th>-->
+      <!--<th>Project</th>-->
 
-    </tr>
+    <!--</tr>-->
 
-  </table>
+  <!--</table>-->
 
   <input type="checkbox" [checked]="accepted" (change)="accepted = !accepted">
 
@@ -40,4 +40,21 @@
     (filePick)="onFilePicked($event)"
     (readEnd)="onReadEnd($event)"> Upload </button>
 
+</div>
+
+<div>
+
+  <ul>
+    <li class="row" style="color: white;margin: 15px" *ngFor="let project of displayProjects">
+
+      <span class="col-6" style="background-color: green" *ngIf="project.isValid">{{ project.name }}</span>
+
+      <span class="col-6" style="background-color: red" *ngIf="!project.isValid">{{ project.name }}</span>
+
+      <!--<span class="col-6"  *ngIf="project.isValid"> coolName </span>-->
+
+      <!--<span class="col-6" style="background-color: red" *ngIf="!project.isValid"> coolName </span>-->
+
+    </li>
+  </ul>
 </div>
