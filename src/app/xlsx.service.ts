@@ -44,9 +44,6 @@ export class XLSXService {
 
     // const employeeNames = this.findColumnData(employeeHeaderIndex, worksheet);
 
-    // console.log(dates);
-    // console.log(projects);
-    // console.log(employeeNames);
 
     // this.dataService.updateTimes();
 

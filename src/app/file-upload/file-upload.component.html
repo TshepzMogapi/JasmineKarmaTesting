@@ -37,23 +37,39 @@
     style="margin-top: 50px;margin-left: 50px"
     type="button" mat-button
     [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
-    (filePick)="onFilePicked($event)"
+    (filePick)="testAfterFilePicked($event)"
     (readEnd)="onReadEnd($event)"> Upload </button>
 
 </div>
 
 <div>
 
-  <ul>
-    <li class="row" style="color: white;margin: 15px" *ngFor="let project of displayProjects">
+  <ul class="container">
 
-      <span class="col-6" style="background-color: green" *ngIf="project.isValid">{{ project.name }}</span>
+    <li class="row" *ngFor="let data of displayData;let i = index">
 
-      <span class="col-6" style="background-color: red" *ngIf="!project.isValid">{{ project.name }}</span>
+      <div *ngIf="data.isValid" style="border: 2px dotted green;margin-top: 25px">
 
-      <!--<span class="col-6"  *ngIf="project.isValid"> coolName </span>-->
+        <span style="margin-right: 150px;" class="col-md-6"> {{ data.project.name }} </span>
 
-      <!--<span class="col-6" style="background-color: red" *ngIf="!project.isValid"> coolName </span>-->
+        <span class="col-md-6"> {{ data.employee.name}} </span>
+
+      </div>
+
+      <div *ngIf="!data.isValid" style="border: 2px dotted red;margin-top: 25px">
+
+        <span *ngIf="data.project.isValid" style="margin-right: 150px;" class="col-md-6"> {{ data.project.name }} </span>
+
+        <span *ngIf="!data.project.isValid" style="margin-right: 150px;background-color: red" class="col-md-6"> {{ data.project.name }} </span>
+
+
+        <span *ngIf="data.employee.isValid" class="col-md-6"> {{ data.employee.name}} </span>
+
+        <span *ngIf="!data.employee.isValid" style="background-color: red" class="col-md-6"> {{ data.employee.name}} </span>
+
+      </div>
+
+
 
     </li>
   </ul>

@@ -2,6 +2,9 @@ import {Component, OnInit, ViewChild} from '@angular/core';
 import { FilePickerDirective, ReadFile, ReadMode } from 'ngx-file-helpers';
 
 import * as XLSX from 'xlsx';
+
+const { read, write, utils } = XLSX;
+
 import {DataService} from '../data.service';
 
 
@@ -22,6 +25,10 @@ export class FileUploadComponent implements OnInit {
   projects = [];
 
   displayProjects = [];
+  displayEmployees = [];
+
+
+  displayData = [];
 
   @ViewChild(FilePickerDirective)  private filePicker;
 
@@ -50,6 +57,31 @@ export class FileUploadComponent implements OnInit {
 
   }
 
+  testAfterFilePicked(file: ReadFile) {
+
+    const workbook = XLSX.read(file.content,  {type: 'binary'});
+
+    const first_sheet_name = workbook.SheetNames[0];
+
+    const  worksheet = workbook.Sheets[first_sheet_name];
+
+    console.log(XLSX.utils.sheet_to_json(worksheet));
+
+    const a = Object.values(worksheet);
+
+    const dateHeaderIndex = this.findKeywordIndex('date', worksheet);
+
+    const projectHeaderIndex = this.findKeywordIndex('project', worksheet);
+
+    const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
+
+    const testIndex = this.findKeywordIndex('2018NOV25', worksheet);
+
+    console.log(dateHeaderIndex + '\t' + projectHeaderIndex + '\t' + employeeHeaderIndex +  '\ttestIndex is at ' + testIndex);
+
+  }
+
+
   onFilePicked(file: ReadFile) {
 
     this.picked = file;
@@ -73,9 +105,13 @@ export class FileUploadComponent implements OnInit {
 
     const projects = this.findColumnData(projectHeaderIndex, worksheet);
 
-    this.displayProjects = [];
+    const employees = this.findColumnData(employeeHeaderIndex, worksheet);
+
+
 
     const distinctProjects = this.getDistinctData(projects);
+
+    const distinctEmployees = this.getDistinctData(employees);
 
     const array1 = [1, 2, 3];
 
@@ -86,20 +122,25 @@ export class FileUploadComponent implements OnInit {
 
     const projectsNames = [];
 
+    const employeeNames = [];
+
 
     this.projects.map((p) => {
       projectsNames.push(p.name);
     });
 
+    this.employees.map((e) => {
+      employeeNames.push(e.name);
+    });
+
+
     const invalidProjects = distinctProjects.filter(value => -1 === projectsNames.indexOf(value));
 
-    console.log(invalidProjects);
+    const invalidEmployees = distinctEmployees.filter(value => -1 === employeeNames.indexOf(value));
 
     projects.map((p) => {
 
-      let i = 0;
-
-
+      // todo verify the check is valid for diff conditions not one/other separate ifs
 
       if (invalidProjects.includes(p)) {
 
@@ -111,6 +152,8 @@ export class FileUploadComponent implements OnInit {
           }
         );
 
+        // this.displayEmployees
+
       } else {
 
         this.displayProjects.push(
@@ -121,17 +164,64 @@ export class FileUploadComponent implements OnInit {
         );
       }
 
-      i++;
     });
 
-    // //
-    //
-    //
-    // const employeeNames: any[] = this.findColumnData(employeeHeaderIndex, worksheet);
+    employees.map((e) => {
 
-    // distinctProjects.filter(value => -1 !== this.projects.indexOf(value));
 
-    // console.log(this.projects.filter(value => -1 !== distinctProjects.indexOf(value)));
+      if (invalidEmployees.includes(e)) {
+
+
+        this.displayEmployees.push(
+          {
+            'name': e,
+            'isValid' : false
+          }
+        );
+
+        // this.displayEmployees
+
+      } else {
+
+        this.displayEmployees.push(
+          {
+            'name': e,
+            'isValid' : true
+          }
+        );
+      }
+
+
+
+
+    });
+
+    for (let u = 0; u < this.displayProjects.length; u++) {
+      this.displayData.push(
+        {
+          'project': this.displayProjects[u],
+          'employee': this.displayEmployees[u],
+          'isValid':  (this.displayProjects[u].isValid && this.displayEmployees[u].isValid)
+        }
+      );
+
+
+      // console.log(this.displayProjects[u].isValid || this.displayEmployees[u].isValid);
+
+      console.log('Project ' + this.displayProjects[u].name  + ' is ' + this.displayProjects[u].isValid
+        + '\t\t\t\t\t\t\t\t\t\t\t\tName  ' + this.displayEmployees[u].name  + ' is ' + this.displayEmployees[u].isValid);
+
+    }
+
+
+
+    // this.displayData = {
+    //   'projects': this.displayProjects,
+    //   'employees': this.displayEmployees
+    // };
+
+    // console.log(this.displayData.projects);
+
 
     // todo modify below for updating
     // this.dataService.updateTimes();
