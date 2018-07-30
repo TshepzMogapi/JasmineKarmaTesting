@@ -64,6 +64,10 @@ export class FileUploadComponent implements OnInit {
 
     const  worksheet = workbook.Sheets[first_sheet_name];
 
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+
+    console.log(range);
+
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
     let isHeaderPresent = null;
@@ -125,11 +129,6 @@ export class FileUploadComponent implements OnInit {
     const distinctEmployees = this.getDistinctData(employees);
 
 
-    console.log(distinctProjects);
-
-    console.log(distinctEmployees);
-
-
     // console.log(Object.values(jsonData));
       // .findIndex(w => w.v === 'date')
 
@@ -160,7 +159,23 @@ export class FileUploadComponent implements OnInit {
     // const wb = XLSX.utils.book_new();
     // XLSX.utils.book_append_sheet(wb, sheet, 'Timesheet');
     //
-    // XLSX.writeFile(wb, 'TimeSheet.xlsx');
+    // XLSX.writeFile(wb, 'TimeSheet-Test.xlsx');
+
+
+    // const table = XLSX.readFile('mytable.xlsx');
+    //
+    // // Use first sheet
+    // const sheet = table.Sheets[table.SheetNames[0]];
+    //
+    //
+    // // Option 1: If you have numeric row and column indexes
+    // sheet[XLSX.utils.encode_cell({r: 1 /* 2 */, c: 2 /* C */})] = {t: 's' /* type: string */, v: 'abc123' /* value */};
+    //
+    // // Option 2: If you have a cell coordinate like 'C2' or 'D15'
+    //
+    // sheet['C2'] = {t: 's' /* type: string */, v: 'abc123' /* value */};
+    //
+    // XLSX.writeFile(table, 'result.xlsx');
 
 
   }
