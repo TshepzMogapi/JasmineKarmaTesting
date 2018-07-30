@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^6.0.9",
     "@angular/router": "^6.0.3",
     "@types/parse": "^1.11.1",
+    "@types/underscore": "^1.8.8",
     "bootstrap": "^4.1.2",
     "core-js": "^2.5.7",
     "ngx-bootstrap": "^3.0.1",
@@ -28,6 +29,7 @@
     "parse": "^1.11.1",
     "rxjs": "^6.2.1",
     "ts-helpers": "^1.1.2",
+    "underscore": "^1.9.1",
     "xlsx": "^0.13.2",
     "zone.js": "^0.8.26"
   },

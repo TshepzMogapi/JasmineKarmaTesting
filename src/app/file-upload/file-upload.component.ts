@@ -6,7 +6,7 @@ import * as XLSX from 'xlsx';
 const { read, write, utils } = XLSX;
 
 import {DataService} from '../data.service';
-
+import * as _ from 'underscore';
 
 
 @Component({
@@ -54,7 +54,6 @@ export class FileUploadComponent implements OnInit {
   onReadStart(fileCount: number) {
     this.status = `Reading ${fileCount} file(s)...`;
 
-
   }
 
   testAfterFilePicked(file: ReadFile) {
@@ -65,7 +64,78 @@ export class FileUploadComponent implements OnInit {
 
     const  worksheet = workbook.Sheets[first_sheet_name];
 
-    console.log(XLSX.utils.sheet_to_json(worksheet));
+    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+    let isHeaderPresent = null;
+
+    let dateIndex = null;
+
+    let projectIndex = null;
+
+    let employeeIndex = null;
+
+    const dates = [];
+
+    const employees = [];
+
+    const projects = [];
+
+
+    jsonData.map((d) => {
+
+
+      if (dateIndex && employeeIndex && projectIndex) {
+        isHeaderPresent = true;
+      }
+
+      if (_.invert(d)['date']) {
+
+        dateIndex =  _.invert(d)['date'];
+
+      }
+
+      if (_.invert(d)['employee']) {
+
+        employeeIndex = _.invert(d)['employee'];
+
+      }
+
+      if (_.invert(d)['project']) {
+
+        projectIndex = _.invert(d)['project'];
+
+      }
+
+
+
+      if (isHeaderPresent) {
+
+        employees.push(d[employeeIndex]);
+
+        projects.push(d[projectIndex]);
+
+
+      }
+
+
+    });
+
+    const distinctProjects = this.getDistinctData(projects);
+
+    const distinctEmployees = this.getDistinctData(employees);
+
+
+    console.log(distinctProjects);
+
+    console.log(distinctEmployees);
+
+
+    // console.log(Object.values(jsonData));
+      // .findIndex(w => w.v === 'date')
+
+    // jsonData.
+
+    // jsonData[5].__EMPTY_5
 
     const a = Object.values(worksheet);
 
@@ -78,6 +148,20 @@ export class FileUploadComponent implements OnInit {
     const testIndex = this.findKeywordIndex('2018NOV25', worksheet);
 
     console.log(dateHeaderIndex + '\t' + projectHeaderIndex + '\t' + employeeHeaderIndex +  '\ttestIndex is at ' + testIndex);
+
+    const data = [
+      {'name': 'John', 'city': 'Seattle'},
+      {'name': 'Mike', 'city': 'Los Angeles'},
+      {'name': 'Zach', 'city': 'New York'}
+    ];
+    //
+    // const sheet = XLSX.utils.json_to_sheet(data);
+    //
+    // const wb = XLSX.utils.book_new();
+    // XLSX.utils.book_append_sheet(wb, sheet, 'Timesheet');
+    //
+    // XLSX.writeFile(wb, 'TimeSheet.xlsx');
+
 
   }
 
@@ -241,6 +325,8 @@ export class FileUploadComponent implements OnInit {
     return i;
 
   }
+
+  // findIndex(jsonData: any, '')
 
 
   findColumnData(topIndex: number, worksheet: object): any[] {
