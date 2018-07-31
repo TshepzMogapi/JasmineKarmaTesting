@@ -17,37 +17,125 @@ export class XLSXService {
 
   constructor() { }
 
-  getData(file: ReadFile) {
-
-    // this.picked = file;
+  // todo return worksheet
+  getWorkSheet(file: ReadFile, sheetName: string, sheetNumber: number): any {
 
     const workbook = XLSX.read(file.content,  {type: 'binary'});
 
-    const first_sheet_name = workbook.SheetNames[0];
+    // todo use parameter sheetNumber below
+
+    const first_sheet_name = workbook.SheetNames[sheetNumber];
 
     const  worksheet = workbook.Sheets[first_sheet_name];
 
+    // todo modify above logic to get desired location
 
-    const a = Object.values(worksheet);
-
-    const dateHeaderIndex = this.findKeywordIndex('date', worksheet);
-
-    const projectHeaderIndex = this.findKeywordIndex('project', worksheet);
-
-    const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
-
-    console.log(employeeHeaderIndex);
-
-    const dates = this.findColumnData(dateHeaderIndex, worksheet);
-
-    const projects = this.findColumnData(projectHeaderIndex, worksheet);
-
-    // const employeeNames = this.findColumnData(employeeHeaderIndex, worksheet);
-
-
-    // this.dataService.updateTimes();
+    return worksheet;
 
   }
+
+  getDataFromSheet(workSheet: any): [any[], any[], any[]] {
+
+    const range = XLSX.utils.decode_range(workSheet['!ref']);
+
+    const cell = {t: '?', v: 'NEW VALUE'};
+
+    let dateRef = null;
+
+    let projectRef = null;
+
+    let employeeRef = null;
+
+    let isHeaderPresent = null;
+
+    let dateColumnRef = null;
+
+    let projectColumnRef = null;
+
+    let employeeColumnRef = null;
+
+    const dates = [];
+
+    const employees = [];
+
+    const projects = [];
+
+    let headerRowRef = null;
+
+    const headerColumnRef = range.e.c;
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+
+        /* find the cell object */
+
+        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+
+        if (workSheet[cellRef]) {
+
+          if (dateRef && employeeRef && projectRef) {
+
+            isHeaderPresent = true;
+          }
+
+          if (workSheet[cellRef].v === 'date') {
+
+            headerRowRef = R;
+
+            dateRef = cellRef;
+
+            dateColumnRef = C;
+
+          }
+
+          if (workSheet[cellRef].v === 'employee') {
+
+            employeeRef = cellRef;
+
+            employeeColumnRef = C;
+
+          }
+
+          if (workSheet[cellRef].v === 'project') {
+
+            projectRef = cellRef;
+
+            projectColumnRef = C;
+
+          }
+
+          if (isHeaderPresent) {
+
+            if (C === dateColumnRef) {
+
+              dates.push(workSheet[cellRef].v);
+
+            }
+
+            if (C === employeeColumnRef) {
+              employees.push(workSheet[cellRef].v);
+            }
+
+            if (C === projectColumnRef) {
+
+              projects.push(workSheet[cellRef].v);
+
+            }
+          }
+
+        }
+
+      }
+    }
+
+
+
+    // todo correct below
+    return [projects, employees, dates];
+
+}
+
+
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
 
@@ -56,7 +144,6 @@ export class XLSXService {
     return i;
 
   }
-
 
   findColumnData(topIndex: number, worksheet: object): any[] {
 
@@ -74,6 +161,7 @@ export class XLSXService {
 
   writeToFile() {
     console.log('writing stuff');
+
   }
 
 }

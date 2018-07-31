@@ -11,7 +11,8 @@ import { ProgressbarModule } from 'ngx-bootstrap/progressbar';
 
 import { AppComponent } from './app.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
-import {DataService} from "./data.service";
+import { DataService } from './data.service';
+import { XLSXService } from './xlsx.service';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import {DataService} from "./data.service";
     BsDropdownModule.forRoot(),
     ProgressbarModule.forRoot()
   ],
-  providers: [DataService],
+  providers: [DataService, XLSXService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

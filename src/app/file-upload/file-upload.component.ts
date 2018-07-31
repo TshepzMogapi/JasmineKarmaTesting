@@ -6,8 +6,10 @@ import * as XLSX from 'xlsx';
 const { read, write, utils } = XLSX;
 
 import {DataService} from '../data.service';
+
 import * as _ from 'underscore';
 
+import {XLSXService} from '../xlsx.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -32,7 +34,7 @@ export class FileUploadComponent implements OnInit {
 
   @ViewChild(FilePickerDirective)  private filePicker;
 
-  constructor(private dataService: DataService) { }
+  constructor(private dataService: DataService, private excelService: XLSXService) { }
 
   ngOnInit() {
 
@@ -64,19 +66,31 @@ export class FileUploadComponent implements OnInit {
 
     const  worksheet = workbook.Sheets[first_sheet_name];
 
+    // const ws = this.excelService.getWorkSheet(file, 'TimeNode')
+
     const range = XLSX.utils.decode_range(worksheet['!ref']);
 
-    console.log(range);
+
+    const cell = {t: '?', v: 'NEW VALUE'};
+
 
     const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
+    // console.log(jsonData);
+
+    let dateRef = null;
+
+    let projectRef = null;
+
+    let employeeRef = null;
+
     let isHeaderPresent = null;
 
-    let dateIndex = null;
+    let dateColumnRef = null;
 
-    let projectIndex = null;
+    let projectColumnRef = null;
 
-    let employeeIndex = null;
+    let employeeColumnRef = null;
 
     const dates = [];
 
@@ -84,46 +98,149 @@ export class FileUploadComponent implements OnInit {
 
     const projects = [];
 
+    let headerRowRef = null;
 
-    jsonData.map((d) => {
+    const headerColumnRef = range.e.c;
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        /* find the cell object */
+
+        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+
+        if (worksheet[cellRef]) {
+
+          if (dateRef && employeeRef && projectRef) {
+
+            isHeaderPresent = true;
+          }
+
+          if (worksheet[cellRef].v === 'date') {
+
+            headerRowRef = R;
+
+            dateRef = cellRef;
+
+            dateColumnRef = C;
+
+          }
+
+          if (worksheet[cellRef].v === 'employee') {
+
+            employeeRef = cellRef;
+
+            employeeColumnRef = C;
+
+          }
+
+          if (worksheet[cellRef].v === 'project') {
+
+            projectRef = cellRef;
+
+            projectColumnRef = C;
+
+          }
+
+          if (isHeaderPresent) {
 
 
-      if (dateIndex && employeeIndex && projectIndex) {
-        isHeaderPresent = true;
+            if (C === dateColumnRef) {
+
+              dates.push(worksheet[cellRef].v);
+
+            }
+
+            if (C === employeeColumnRef) {
+              employees.push(worksheet[cellRef].v);
+            }
+
+            if (C === projectColumnRef) {
+
+             projects.push(worksheet[cellRef].v);
+
+            }
+          }
+
+
+
+        }
+
+
+        // if(!worksheet[cellref]) continue; // if cell doesn't exist, move on
+        // var cell = worksheet[cellref];
+
+        /* if the cell is a text cell with the old string, change it */
+        // if(!(cell.t == 's' || cell.t == 'str')) continue; // skip if cell is not text
+        // if(cell.v === oldtext) cell.v = newtext; // change the cell value
       }
+    }
 
-      if (_.invert(d)['date']) {
-
-        dateIndex =  _.invert(d)['date'];
-
-      }
-
-      if (_.invert(d)['employee']) {
-
-        employeeIndex = _.invert(d)['employee'];
-
-      }
-
-      if (_.invert(d)['project']) {
-
-        projectIndex = _.invert(d)['project'];
-
-      }
+    // console.log(projects);
+    //
+    // // console.log('Date ref = ' + dateRef + ' Project Ref = ' +  projectRef + ' Employee Ref = ' + employeeRef);
+    //
+    // console.log('Header Row Ref  ' + headerRowRef + '   Header Column Ref  ' + headerColumnRef);
 
 
+    // let isHeaderPresent = null;
 
-      if (isHeaderPresent) {
-
-        employees.push(d[employeeIndex]);
-
-        projects.push(d[projectIndex]);
-
-
-      }
-
-
-    });
-
+    // let dateIndex = null;
+    //
+    // let projectIndex = null;
+    //
+    // let employeeIndex = null;
+    //
+    // const dates = [];
+    //
+    // const employees = [];
+    //
+    // const projects = [];
+    //
+    //
+    // jsonData.map((d) => {
+    //
+    //   if (dateIndex && employeeIndex && projectIndex) {
+    //     isHeaderPresent = true;
+    //   }
+    //
+    //   if (_.invert(d)['date']) {
+    //
+    //     dateIndex =  _.invert(d)['date'];
+    //
+    //
+    //
+    //   }
+    //
+    //   if (_.invert(d)['employee']) {
+    //
+    //     employeeIndex = _.invert(d)['employee'];
+    //
+    //
+    //
+    //   }
+    //
+    //   if (_.invert(d)['project']) {
+    //
+    //     projectIndex = _.invert(d)['project'];
+    //
+    //
+    //
+    //   }
+    //
+    //
+    //
+    //   if (isHeaderPresent) {
+    //
+    //     employees.push(d[employeeIndex]);
+    //
+    //     projects.push(d[projectIndex]);
+    //
+    //
+    //   }
+    //
+    //
+    // });
+    //
     const distinctProjects = this.getDistinctData(projects);
 
     const distinctEmployees = this.getDistinctData(employees);
@@ -140,13 +257,22 @@ export class FileUploadComponent implements OnInit {
 
     const dateHeaderIndex = this.findKeywordIndex('date', worksheet);
 
+
     const projectHeaderIndex = this.findKeywordIndex('project', worksheet);
 
     const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
 
     const testIndex = this.findKeywordIndex('2018NOV25', worksheet);
 
-    console.log(dateHeaderIndex + '\t' + projectHeaderIndex + '\t' + employeeHeaderIndex +  '\ttestIndex is at ' + testIndex);
+    // console.log(range);
+    //
+    // console.log(projectIndex);
+    // console.log(employeeIndex);
+    // console.log(dateIndex);
+
+
+
+    // console.log(dateHeaderIndex + '\t' + projectHeaderIndex + '\t' + employeeHeaderIndex +  '\ttestIndex is at ' + testIndex);
 
     const data = [
       {'name': 'John', 'city': 'Seattle'},
@@ -154,10 +280,11 @@ export class FileUploadComponent implements OnInit {
       {'name': 'Zach', 'city': 'New York'}
     ];
     //
-    // const sheet = XLSX.utils.json_to_sheet(data);
-    //
-    // const wb = XLSX.utils.book_new();
-    // XLSX.utils.book_append_sheet(wb, sheet, 'Timesheet');
+    const sheet = XLSX.utils.json_to_sheet(data);
+
+    const wb = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(wb, sheet, 'Timesheet');
     //
     // XLSX.writeFile(wb, 'TimeSheet-Test.xlsx');
 
@@ -185,133 +312,13 @@ export class FileUploadComponent implements OnInit {
 
     this.picked = file;
 
-    const workbook = XLSX.read(file.content,  {type: 'binary'});
-
-    const first_sheet_name = workbook.SheetNames[0];
-
-    const  worksheet = workbook.Sheets[first_sheet_name];
-
+    const worksheet = this.excelService.getWorkSheet(file, 'TimeNode', 0);
 
     const a = Object.values(worksheet);
 
-    const dateHeaderIndex = this.findKeywordIndex('date', worksheet);
+    const excelData = this.excelService.getDataFromSheet(worksheet);
 
-    const projectHeaderIndex = this.findKeywordIndex('project', worksheet);
-
-    const employeeHeaderIndex = this.findKeywordIndex('employee', worksheet);
-
-    const dates = this.findColumnData(dateHeaderIndex, worksheet);
-
-    const projects = this.findColumnData(projectHeaderIndex, worksheet);
-
-    const employees = this.findColumnData(employeeHeaderIndex, worksheet);
-
-
-
-    const distinctProjects = this.getDistinctData(projects);
-
-    const distinctEmployees = this.getDistinctData(employees);
-
-    const array1 = [1, 2, 3];
-
-    const array2 = [2, 3, 4, 5];
-
-
-    //
-
-    const projectsNames = [];
-
-    const employeeNames = [];
-
-
-    this.projects.map((p) => {
-      projectsNames.push(p.name);
-    });
-
-    this.employees.map((e) => {
-      employeeNames.push(e.name);
-    });
-
-
-    const invalidProjects = distinctProjects.filter(value => -1 === projectsNames.indexOf(value));
-
-    const invalidEmployees = distinctEmployees.filter(value => -1 === employeeNames.indexOf(value));
-
-    projects.map((p) => {
-
-      // todo verify the check is valid for diff conditions not one/other separate ifs
-
-      if (invalidProjects.includes(p)) {
-
-
-        this.displayProjects.push(
-          {
-            'name': p,
-            'isValid' : false
-          }
-        );
-
-        // this.displayEmployees
-
-      } else {
-
-        this.displayProjects.push(
-          {
-            'name': p,
-            'isValid' : true
-          }
-        );
-      }
-
-    });
-
-    employees.map((e) => {
-
-
-      if (invalidEmployees.includes(e)) {
-
-
-        this.displayEmployees.push(
-          {
-            'name': e,
-            'isValid' : false
-          }
-        );
-
-        // this.displayEmployees
-
-      } else {
-
-        this.displayEmployees.push(
-          {
-            'name': e,
-            'isValid' : true
-          }
-        );
-      }
-
-
-
-
-    });
-
-    for (let u = 0; u < this.displayProjects.length; u++) {
-      this.displayData.push(
-        {
-          'project': this.displayProjects[u],
-          'employee': this.displayEmployees[u],
-          'isValid':  (this.displayProjects[u].isValid && this.displayEmployees[u].isValid)
-        }
-      );
-
-
-      // console.log(this.displayProjects[u].isValid || this.displayEmployees[u].isValid);
-
-      console.log('Project ' + this.displayProjects[u].name  + ' is ' + this.displayProjects[u].isValid
-        + '\t\t\t\t\t\t\t\t\t\t\t\tName  ' + this.displayEmployees[u].name  + ' is ' + this.displayEmployees[u].isValid);
-
-    }
-
+    console.log(excelData);
 
 
     // this.displayData = {

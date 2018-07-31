@@ -37,7 +37,7 @@
     style="margin-top: 50px;margin-left: 50px"
     type="button" mat-button
     [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
-    (filePick)="testAfterFilePicked($event)"
+    (filePick)="onFilePicked($event)"
     (readEnd)="onReadEnd($event)"> Upload </button>
 
 </div>

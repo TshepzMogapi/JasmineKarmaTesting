@@ -94,6 +94,27 @@ export class DataService {
 
   }
 
+  getProjectNames(): any[] {
+
+    const projectsNames = [];
+
+    this.getProjects().map((p) => {
+      projectsNames.push(p.name);
+    });
+
+    return projectsNames;
+  }
+
+  getEmployeeNames(): any[] {
+
+    const employeeNames = [];
+
+    this.getEmployees().map((e) => {
+      employeeNames.push(e.name);
+    });
+    return employeeNames;
+  }
+
   updateTimes(): void {
 
     const Time = Parse.Object.extend('Time');
