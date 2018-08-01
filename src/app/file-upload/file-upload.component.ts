@@ -311,7 +311,6 @@ export class FileUploadComponent implements OnInit {
 
     const worksheet = wb[0];
 
-
     let range = XLSX.utils.decode_range(worksheet['!ref']);
 
     console.log(range);
@@ -322,6 +321,8 @@ export class FileUploadComponent implements OnInit {
     const distinctData = this.utilService.getDistinctData(excelData[0]);
 
     const projectNames = this.utilService.getProjectNames(this.projects);
+
+    const employeeNames = this.utilService.getProjectNames(this.employees);
 
     const invalidData = this.utilService.getNonExistentData(projectNames, distinctData);
 
