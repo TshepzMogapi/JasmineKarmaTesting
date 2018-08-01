@@ -19,7 +19,6 @@ export class DataService {
   }
 
 
-
   getEmployees(): any[] {
 
     let employee = {
@@ -90,16 +89,16 @@ export class DataService {
 
     return projects;
 
-
-
   }
 
-  getProjectNames(): any[] {
+  getProjectNames(projects: any[]): any[] {
 
     const projectsNames = [];
 
-    this.getProjects().map((p) => {
+    projects.map((p) => {
+
       projectsNames.push(p.name);
+
     });
 
     return projectsNames;

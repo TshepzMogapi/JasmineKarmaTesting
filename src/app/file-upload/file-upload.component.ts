@@ -10,6 +10,7 @@ import {DataService} from '../data.service';
 import * as _ from 'underscore';
 
 import {XLSXService} from '../xlsx.service';
+import {UtilService} from '../util.service';
 
 @Component({
   selector: 'app-file-upload',
@@ -29,27 +30,21 @@ export class FileUploadComponent implements OnInit {
   displayProjects = [];
   displayEmployees = [];
 
+  nErrors = null;
 
   displayData = [];
 
   @ViewChild(FilePickerDirective)  private filePicker;
 
-  constructor(private dataService: DataService, private excelService: XLSXService) { }
+  constructor(private dataService: DataService,
+              private excelService: XLSXService,
+              private utilService: UtilService) { }
 
   ngOnInit() {
-
-    const array1 = [1, 2, 3];
-
-    const array2 = [2, 3, 4, 5];
-
-
-    console.log(array1.includes(2));
 
     this.employees = this.dataService.getEmployees();
 
     this.projects = this.dataService.getProjects();
-
-
 
   }
 
@@ -312,21 +307,75 @@ export class FileUploadComponent implements OnInit {
 
     this.picked = file;
 
-    const worksheet = this.excelService.getWorkSheet(file, 'TimeNode', 0);
+    const wb = this.excelService.getWorkSheet(file, 'TimeNode', 0);
 
-    const a = Object.values(worksheet);
+    const worksheet = wb[0];
+
+
+    let range = XLSX.utils.decode_range(worksheet['!ref']);
+
+    console.log(range);
 
     const excelData = this.excelService.getDataFromSheet(worksheet);
 
-    console.log(excelData);
+    // todo get Projects, Dates , Hours , Employees
+    const distinctData = this.utilService.getDistinctData(excelData[0]);
+
+    const projectNames = this.utilService.getProjectNames(this.projects);
+
+    const invalidData = this.utilService.getNonExistentData(projectNames, distinctData);
+
+    const worksheetRange = excelData[3];
+
+    // console.log(worksheetRange);
+
+    const cell = {t: '?', v: 'NEW VALUE'};
+
+    const cellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: worksheetRange[0]});
+
+    // console.log(cellRef);
+
+    const address = XLSX.utils.decode_cell(cellRef);
+
+    worksheet[cellRef] = cell;
+
+    // console.log(address);
+
+    // worksheetRange.map(r => {
+    //   console.log(r);
+    // });
+
+    const newRange = {
+      s: {c: range.s.c, r: range.s.r},
+      e: {c: range.e.c + 1, r: range.e.r}
+    };
+
+    console.log(range);
+
+    // console.log(newRange);
+
+    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+
+    range = XLSX.utils.decode_range(worksheet['!ref']);
+
+    // console.log(XLSX.utils.);
+
+    worksheet[cellRef].v = 'Error Error';
+
+    // XLSX.utils.(wb[1], worksheet, 'TimeSheet-Updated');
+
+    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
 
-    // this.displayData = {
-    //   'projects': this.displayProjects,
-    //   'employees': this.displayEmployees
-    // };
 
-    // console.log(this.displayData.projects);
+    //
+    // const updatedWorkSheetRange = worksheetRange.e.c += 1;
+
+    // console.log(worksheetRange);
+    /* update range */
+    // worksheet['!ref'] = XLSX.utils.encode_range(range);
+
+    this.nErrors = invalidData.length;
 
 
     // todo modify below for updating

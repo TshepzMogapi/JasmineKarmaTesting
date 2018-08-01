@@ -22,27 +22,25 @@ export class UtilService {
   // non existent
   getNonExistentData(validDataArray: any[], unverifiedDataArray: any[]): any[] {
 
-    // let employees = [];
-    // let projects = [];
-    //
-    // employees = this.dataService.getEmployees();
-    // projects = this.dataService.getProjects();
-    //
-    // const distinctProjects = this.getDistinctData(projects);
-    // const distinctEmployees = this.getDistinctData(employees);
+    const distinctData = this.getDistinctData(unverifiedDataArray);
 
-
-    const distinctData = this.getDistinctData(validDataArray);
-
-    const nonExistentData = distinctData.filter(value => -1 === unverifiedDataArray.indexOf(value));
+    const nonExistentData = distinctData.filter(value => -1 === validDataArray.indexOf(value));
 
     return nonExistentData;
   }
 
-  //
-  // const invalidProjects = distinctProjects.filter(value => -1 === projectsNames.indexOf(value));
-  //
-  // const invalidEmployees = distinctEmployees.filter(value => -1 === employeeNames.indexOf(value));
+  getProjectNames(projects: any[]): any[] {
+
+    const projectsNames = [];
+
+    projects.map((p) => {
+
+      projectsNames.push(p.name);
+
+    });
+
+    return projectsNames;
+  }
 
 
 }

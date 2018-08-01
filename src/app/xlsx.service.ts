@@ -30,13 +30,15 @@ export class XLSXService {
 
     // todo modify above logic to get desired location
 
-    return worksheet;
+    return [worksheet, workbook];
 
   }
 
-  getDataFromSheet(workSheet: any): [any[], any[], any[]] {
+  getDataFromSheet(workSheet: any): [any[], any[], any[], any[]] {
 
     const range = XLSX.utils.decode_range(workSheet['!ref']);
+
+    const r = range;
 
     const cell = {t: '?', v: 'NEW VALUE'};
 
@@ -130,12 +132,10 @@ export class XLSXService {
 
 
 
-    // todo correct below
-    return [projects, employees, dates];
+    // todo modify below
+    return [projects, employees, dates, [headerRowRef, range.e.c]];
 
 }
-
-
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
 
@@ -159,7 +159,7 @@ export class XLSXService {
 
   }
 
-  writeToFile() {
+  writeToWorkSheet() {
     console.log('writing stuff');
 
   }
