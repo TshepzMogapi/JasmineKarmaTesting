@@ -12,6 +12,8 @@ import * as _ from 'underscore';
 import {XLSXService} from '../xlsx.service';
 import {UtilService} from '../util.service';
 
+import {moment} from 'ngx-bootstrap/chronos/test/chain';
+
 @Component({
   selector: 'app-file-upload',
   templateUrl: './file-upload.component.html',
@@ -335,7 +337,11 @@ export class FileUploadComponent implements OnInit {
 
     const worksheetRange = excelData[3];
 
-    console.log(worksheetRange[1]);
+    console.log(excelData[3]);
+    //
+    // excelData[2].map(ty => {
+    //   console.log(moment(ty.v, moment.ISO_8601, true).isValid());
+    // });
 
     const newRange = {
       s: {c: range.s.c, r: range.s.r},
@@ -352,28 +358,34 @@ export class FileUploadComponent implements OnInit {
 
     const address = XLSX.utils.decode_cell(cellRef);
 
-    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+    // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
     let i = 0;
 
-    (excelData[3][2]).map(d => {
+    (excelData[4][2]).map(d => {
 
 
       // if -1 is valid
-      const errorCellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: excelData[3][2][i]});
+      const errorCellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: excelData[4][2][i]});
 
       const cell = {t: '?', v: 'Invalid record'};
 
 
-      if (invalidProjects.indexOf(excelData[0][i]) !== -1) {
+      if (invalidProjects.indexOf(excelData[0][i]) !== -1
+        || invalidEmployees.indexOf(excelData[1][i]) !== -1
+        || !moment(excelData[2][i].v, moment.ISO_8601, true).isValid()) {
 
-        console.log(errorCellRef + ' = ' + excelData[0][i]);
+        // console.log('Project Name = ' + excelData[0][i] + ' ||||| Employee Name = ' + excelData[1][i]);
+
+        // console.log(moment(excelData[2][i].v, moment.ISO_8601, true).isValid());
+
+        worksheet[errorCellRef] = cell;
 
       } else {
 
-        console.log(errorCellRef + ' = ' + excelData[0][i]);
+        console.log('Valid');
 
-        worksheet[errorCellRef] = cell;
+        // worksheet[errorCellRef] = cell;
 
       }
 
@@ -381,7 +393,7 @@ export class FileUploadComponent implements OnInit {
 
     });
 
-    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+    // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
 
     // const newRange = {

@@ -20,7 +20,7 @@ export class XLSXService {
   // todo return worksheet
   getWorkSheet(file: ReadFile, sheetName: string, sheetNumber: number): any {
 
-    const workbook = XLSX.read(file.content,  {type: 'binary'});
+    const workbook = XLSX.read(file.content,  {type: 'binary', cellDates: true});
 
     // todo use parameter sheetNumber below
 
@@ -34,7 +34,7 @@ export class XLSXService {
 
   }
 
-  getDataFromSheet(workSheet: any): [any[], any[], any[], any[]] {
+  getDataFromSheet(workSheet: any): [any[], any[], any[], any[], any[]] {
 
     const range = XLSX.utils.decode_range(workSheet['!ref']);
 
@@ -48,6 +48,8 @@ export class XLSXService {
 
     let employeeRef = null;
 
+    let hoursRef = null;
+
     let isHeaderPresent = null;
 
     let dateColumnRef = null;
@@ -56,11 +58,15 @@ export class XLSXService {
 
     let employeeColumnRef = null;
 
+    let hoursColumnRef = null;
+
     const dates = [];
 
     const employees = [];
 
     const projects = [];
+
+    const hours = [];
 
     let headerRowRef = null;
 
@@ -77,7 +83,8 @@ export class XLSXService {
 
         if (workSheet[cellRef]) {
 
-          if (dateRef && employeeRef && projectRef) {
+          if (dateRef && employeeRef
+            && projectRef && hoursRef) {
 
             isHeaderPresent = true;
           }
@@ -100,6 +107,14 @@ export class XLSXService {
 
           }
 
+          if (workSheet[cellRef].v === 'hours') {
+
+            hoursRef = cellRef;
+
+            hoursColumnRef = C;
+
+          }
+
           if (workSheet[cellRef].v === 'project') {
 
             projectRef = cellRef;
@@ -114,7 +129,7 @@ export class XLSXService {
 
               recordsRowRef.push(R);
 
-              dates.push(workSheet[cellRef].v);
+              dates.push(workSheet[cellRef]);
 
             }
 
@@ -128,6 +143,14 @@ export class XLSXService {
               projects.push(workSheet[cellRef].v);
 
             }
+
+            if (C === hoursColumnRef) {
+
+              hours.push(workSheet[cellRef].v);
+
+            }
+
+
           }
 
         }
@@ -138,7 +161,7 @@ export class XLSXService {
 
 
     // todo modify below
-    return [projects, employees, dates, [headerRowRef, range.e.c, recordsRowRef]];
+    return [projects, employees, dates, hours, [headerRowRef, range.e.c, recordsRowRef]];
 
 }
 
