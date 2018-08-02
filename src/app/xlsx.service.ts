@@ -66,6 +66,8 @@ export class XLSXService {
 
     const headerColumnRef = range.e.c;
 
+    const recordsRowRef = [];
+
     for (let R = range.s.r; R <= range.e.r; ++R) {
       for (let C = range.s.c; C <= range.e.c; ++C) {
 
@@ -110,11 +112,14 @@ export class XLSXService {
 
             if (C === dateColumnRef) {
 
+              recordsRowRef.push(R);
+
               dates.push(workSheet[cellRef].v);
 
             }
 
             if (C === employeeColumnRef) {
+
               employees.push(workSheet[cellRef].v);
             }
 
@@ -133,9 +138,11 @@ export class XLSXService {
 
 
     // todo modify below
-    return [projects, employees, dates, [headerRowRef, range.e.c]];
+    return [projects, employees, dates, [headerRowRef, range.e.c, recordsRowRef]];
 
 }
+
+  // classifyRecords()
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
 

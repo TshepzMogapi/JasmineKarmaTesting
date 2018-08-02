@@ -42,6 +42,11 @@ export class FileUploadComponent implements OnInit {
 
   ngOnInit() {
 
+    const arr = [1, 2, 3];
+
+
+    console.log(arr.indexOf(2));
+
     this.employees = this.dataService.getEmployees();
 
     this.projects = this.dataService.getProjects();
@@ -313,24 +318,33 @@ export class FileUploadComponent implements OnInit {
 
     let range = XLSX.utils.decode_range(worksheet['!ref']);
 
-    console.log(range);
-
     const excelData = this.excelService.getDataFromSheet(worksheet);
 
     // todo get Projects, Dates , Hours , Employees
-    const distinctData = this.utilService.getDistinctData(excelData[0]);
+    const distinctProjects = this.utilService.getDistinctData(excelData[0]);
+
+    const distinctEmployees = this.utilService.getDistinctData(excelData[1]);
 
     const projectNames = this.utilService.getProjectNames(this.projects);
 
     const employeeNames = this.utilService.getProjectNames(this.employees);
 
-    const invalidData = this.utilService.getNonExistentData(projectNames, distinctData);
+    const invalidProjects = this.utilService.getNonExistentData(projectNames, distinctProjects);
+
+    const invalidEmployees = this.utilService.getNonExistentData(employeeNames, distinctEmployees);
 
     const worksheetRange = excelData[3];
 
-    // console.log(worksheetRange);
+    console.log(worksheetRange[1]);
 
-    const cell = {t: '?', v: 'NEW VALUE'};
+    const newRange = {
+      s: {c: range.s.c, r: range.s.r},
+      e: {c: range.e.c + 1, r: range.e.r}
+    };
+
+    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+
+    range = XLSX.utils.decode_range(worksheet['!ref']);
 
     const cellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: worksheetRange[0]});
 
@@ -338,35 +352,84 @@ export class FileUploadComponent implements OnInit {
 
     const address = XLSX.utils.decode_cell(cellRef);
 
-    worksheet[cellRef] = cell;
+    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+
+    let i = 0;
+
+    (excelData[3][2]).map(d => {
+
+
+      // if -1 is valid
+      const errorCellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: excelData[3][2][i]});
+
+      const cell = {t: '?', v: 'Invalid record'};
+
+
+      if (invalidProjects.indexOf(excelData[0][i]) !== -1) {
+
+        console.log(errorCellRef + ' = ' + excelData[0][i]);
+
+      } else {
+
+        console.log(errorCellRef + ' = ' + excelData[0][i]);
+
+        worksheet[errorCellRef] = cell;
+
+      }
+
+      i++;
+
+    });
+
+    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+
+
+    // const newRange = {
+    //   s: {c: range.s.c, r: range.s.r},
+    //   e: {c: range.e.c + 1, r: range.e.r}
+    // };
+    //
+    // worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+    //
+    // range = XLSX.utils.decode_range(worksheet['!ref']);
+    //
+    // const cellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: worksheetRange[0]});
+    //
+    // // console.log(cellRef);
+    //
+    // const address = XLSX.utils.decode_cell(cellRef);
+    //
+    // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+
+
+    // worksheet[cellRef] = cell;
 
     // console.log(address);
 
     // worksheetRange.map(r => {
     //   console.log(r);
     // });
+    //
+    // const newRange = {
+    //   s: {c: range.s.c, r: range.s.r},
+    //   e: {c: range.e.c + 1, r: range.e.r}
+    // };
 
-    const newRange = {
-      s: {c: range.s.c, r: range.s.r},
-      e: {c: range.e.c + 1, r: range.e.r}
-    };
-
-    console.log(range);
 
     // console.log(newRange);
 
-    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
-
-    range = XLSX.utils.decode_range(worksheet['!ref']);
+    // worksheet['!ref'] = XLSX.utils.encode_range(newRange);
+    //
+    // range = XLSX.utils.decode_range(worksheet['!ref']);
 
     // console.log(XLSX.utils.);
 
-    worksheet[cellRef].v = 'Error Error';
-
-    // XLSX.utils.(wb[1], worksheet, 'TimeSheet-Updated');
-
-    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
-
+    // worksheet[cellRef].v = 'Error Error';
+    //
+    // // XLSX.utils.(wb[1], worksheet, 'TimeSheet-Updated');
+    //
+    // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+    //
 
 
     //
@@ -376,7 +439,7 @@ export class FileUploadComponent implements OnInit {
     /* update range */
     // worksheet['!ref'] = XLSX.utils.encode_range(range);
 
-    this.nErrors = invalidData.length;
+    // this.nErrors = invalidData.length;
 
 
     // todo modify below for updating
