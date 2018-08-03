@@ -87,6 +87,7 @@ export class XLSXService {
             && projectRef && hoursRef) {
 
             isHeaderPresent = true;
+
           }
 
           if (workSheet[cellRef].v === 'date') {
