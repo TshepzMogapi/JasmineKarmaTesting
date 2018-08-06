@@ -63,7 +63,7 @@ export class DataService {
       'name': ''
     };
 
-    const projects = [];
+    let projects = [];
 
     const Projects = Parse.Object.extend('Project');
 
@@ -86,6 +86,10 @@ export class DataService {
       }
 
     });
+
+    // todo modify below after query database
+    projects = [{'id': 546, 'name': 'Bryanston Towers'},
+      {'id': 456, 'name': 'AfricaMall'}];
 
     return projects;
 

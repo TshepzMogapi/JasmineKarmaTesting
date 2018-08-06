@@ -226,5 +226,23 @@ export class FileUploadComponent implements OnInit {
 
 
 
+  addSubProjects(file: ReadFile) {
+
+    const wb = this.excelService.getWorkSheet(file, 'TimeNode', 2);
+
+    const worksheet = wb[0];
+
+    // let range = XLSX.utils.decode_range(worksheet['!ref']);
+
+    const excelData = this.excelService.getDataFromSheet(worksheet);
+
+
+    console.log((excelData[0]));
+
+
+  }
+
+
+
 
 }

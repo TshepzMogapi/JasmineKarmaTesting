@@ -78,3 +78,12 @@
     </li>
   </ul>
 </div>
+
+
+<button
+
+  style="margin-top: 50px;margin-left: 50px"
+  type="button" mat-button
+  [ngxFilePicker]="readMode"  (readStart)="onReadStart($event)"
+  (filePick)="addSubProjects($event)"
+  (readEnd)="onReadEnd($event)"> Add Sub Projects </button>

@@ -195,4 +195,135 @@ export class XLSXService {
 
   }
 
+  addSubProjectsToWorkSheet(file: ReadFile, sheetName: string, sheetNumber: number) {
+
+    const workbook = XLSX.read(file.content,  {type: 'binary', cellDates: true});
+
+    // todo use parameter sheetNumber below
+
+    const first_sheet_name = workbook.SheetNames[sheetNumber];
+
+    const  worksheet = workbook.Sheets[first_sheet_name];
+
+    // todo modify above logic to get desired location
+
+    return [worksheet, workbook];
+  }
+
+
+  getProjectData(workSheet: any) {
+
+
+    const range = XLSX.utils.decode_range(workSheet['!ref']);
+
+    const r = range;
+
+    const cell = {t: '?', v: 'NEW VALUE'};
+
+    let projectCodeRef = null;
+
+    let projectNameRef = null;
+
+    let projectManagerRef = null;
+
+    let isHeaderPresent = null;
+
+    let projectCodeColumnRef = null;
+
+    let projectNameColumnRef = null;
+
+    let projectManagerColumnRef = null;
+
+    const codes = [];
+
+    const managers = [];
+
+    const projects = [];
+
+    const hours = [];
+
+    let headerRowRef = null;
+
+    const headerColumnRef = range.e.c;
+
+    const recordsRowRef = [];
+
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+
+        /* find the cell object */
+
+        const cellRef = XLSX.utils.encode_cell({c: C, r: R});
+
+        if (workSheet[cellRef]) {
+
+          if (projectCodeRef && projectManagerRef
+            && projectNameRef ) {
+
+            isHeaderPresent = true;
+
+          }
+
+          if (workSheet[cellRef].v === 'Project Code') {
+
+            headerRowRef = R;
+
+            projectCodeRef = cellRef;
+
+            projectCodeColumnRef = C;
+
+          }
+
+          if (workSheet[cellRef].v === 'Project Manager') {
+
+            projectManagerRef = cellRef;
+
+            projectManagerColumnRef = C;
+
+          }
+
+
+
+          if (workSheet[cellRef].v === 'Project Name') {
+
+            projectNameRef = cellRef;
+
+            projectNameColumnRef = C;
+
+          }
+
+          if (isHeaderPresent) {
+
+            if (C === projectCodeColumnRef) {
+
+              recordsRowRef.push(R);
+
+              codes.push(workSheet[cellRef]);
+
+            }
+
+            if (C === projectManagerColumnRef) {
+
+              managers.push(workSheet[cellRef].v);
+            }
+
+            if (C === projectNameColumnRef) {
+
+              projects.push(workSheet[cellRef].v);
+
+            }
+
+          }
+
+        }
+
+      }
+    }
+
+    
+    // todo modify below
+    return [projects, managers, codes, hours, [headerRowRef, range.e.c, recordsRowRef]];
+
+  }
+
 }
