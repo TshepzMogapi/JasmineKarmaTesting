@@ -34,11 +34,34 @@ export class XLSXService {
 
   }
 
-  getDataFromSheet(workSheet: any): [any[], any[], any[], any[], any[]] {
+  getDataFromSheet(workSheet: any, headerNames: string[]): [any[], any[], any[], any[], any[]] {
 
     const range = XLSX.utils.decode_range(workSheet['!ref']);
 
     const r = range;
+
+
+
+    const headers = ['project', 'employee', 'startDay'];
+
+    const variables = {};
+
+    for (let i = 0; i < headers.length; i++) {
+
+    }
+
+    variables['Variable'] = null;
+
+    
+
+
+    const projectHeader = 'Project';
+
+    const startDayHeader = 'Day';
+
+    const employeeHeader = 'Employee';
+
+    const hoursHeader = 'Hours';
 
     const cell = {t: '?', v: 'NEW VALUE'};
 
@@ -90,7 +113,7 @@ export class XLSXService {
 
           }
 
-          if (workSheet[cellRef].v === 'date') {
+          if (workSheet[cellRef].v === startDayHeader) {
 
             headerRowRef = R;
 
@@ -100,7 +123,7 @@ export class XLSXService {
 
           }
 
-          if (workSheet[cellRef].v === 'employee') {
+          if (workSheet[cellRef].v === employeeHeader) {
 
             employeeRef = cellRef;
 
@@ -108,7 +131,7 @@ export class XLSXService {
 
           }
 
-          if (workSheet[cellRef].v === 'hours') {
+          if (workSheet[cellRef].v === hoursHeader) {
 
             hoursRef = cellRef;
 
@@ -116,7 +139,7 @@ export class XLSXService {
 
           }
 
-          if (workSheet[cellRef].v === 'project') {
+          if (workSheet[cellRef].v === projectHeader) {
 
             projectRef = cellRef;
 
@@ -210,7 +233,6 @@ export class XLSXService {
     return [worksheet, workbook];
   }
 
-
   getProjectData(workSheet: any) {
 
 
@@ -226,6 +248,8 @@ export class XLSXService {
 
     let projectManagerRef = null;
 
+    let subProjectRef = null;
+
     let isHeaderPresent = null;
 
     let projectCodeColumnRef = null;
@@ -234,13 +258,15 @@ export class XLSXService {
 
     let projectManagerColumnRef = null;
 
+    let subProjectsColumnRef = null;
+
     const codes = [];
 
     const managers = [];
 
     const projects = [];
 
-    const hours = [];
+    const subProjects = [];
 
     let headerRowRef = null;
 
@@ -283,12 +309,19 @@ export class XLSXService {
           }
 
 
-
           if (workSheet[cellRef].v === 'Project Name') {
 
             projectNameRef = cellRef;
 
             projectNameColumnRef = C;
+
+          }
+
+          if (workSheet[cellRef].v === 'Sub Project Name (or stages of work)') {
+
+            subProjectRef = cellRef;
+
+            subProjectsColumnRef = C;
 
           }
 
@@ -298,20 +331,22 @@ export class XLSXService {
 
               recordsRowRef.push(R);
 
-              codes.push(workSheet[cellRef]);
+              codes.push([workSheet[cellRef], C]);
 
             }
 
             if (C === projectManagerColumnRef) {
 
-              managers.push(workSheet[cellRef].v);
+              managers.push([workSheet[cellRef].v, C]);
             }
 
             if (C === projectNameColumnRef) {
 
-              projects.push(workSheet[cellRef].v);
+              projects.push([workSheet[cellRef].v, C]);
 
             }
+
+
 
           }
 
@@ -320,9 +355,9 @@ export class XLSXService {
       }
     }
 
-    
+
     // todo modify below
-    return [projects, managers, codes, hours, [headerRowRef, range.e.c, recordsRowRef]];
+    return [projects, managers, codes, subProjects, [headerRowRef, subProjectsColumnRef, recordsRowRef]];
 
   }
 

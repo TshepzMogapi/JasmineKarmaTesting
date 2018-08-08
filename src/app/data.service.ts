@@ -73,23 +73,21 @@ export class DataService {
 
       for (let i = 0; i < results.length; i++) {
 
+        // console.log(results[i].attributes.name);
+
         project = {
           'id': null,
           'name': ''
         };
 
         project.id = results[i].id;
-        project.name = results[i].attributes.Name;
+        project.name = results[i].attributes.name;
 
         projects.push(project);
 
       }
 
     });
-
-    // todo modify below after query database
-    projects = [{'id': 546, 'name': 'Bryanston Towers'},
-      {'id': 456, 'name': 'AfricaMall'}];
 
     return projects;
 

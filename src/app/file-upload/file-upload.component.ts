@@ -29,9 +29,6 @@ export class FileUploadComponent implements OnInit {
   employees = [];
   projects = [];
 
-  displayProjects = [];
-  displayEmployees = [];
-
   nErrors = null;
 
   displayData = [];
@@ -44,14 +41,37 @@ export class FileUploadComponent implements OnInit {
 
   ngOnInit() {
 
-    const arr = [1, 2, 3];
+    const headers = ['project', 'employee'];
+
+    const a = {};
+
+    a['Variable'] = null;
+
+    console.log(a);
 
 
-    console.log(arr.indexOf(2));
+
+
+
+
+    // for (let i = 0; i < 2; i++) {
+    //
+    //   console.log( eval(' alphabet' + i)  );
+    //   this['ref' + i] = 'test';
+    // }
+
+
+
 
     this.employees = this.dataService.getEmployees();
 
     this.projects = this.dataService.getProjects();
+
+    // this.projects.map((p) => {
+    //
+    //   console.log(p);
+    //
+    // });
 
   }
 
@@ -71,9 +91,11 @@ export class FileUploadComponent implements OnInit {
 
     let range = XLSX.utils.decode_range(worksheet['!ref']);
 
-    const excelData = this.excelService.getDataFromSheet(worksheet);
+    const excelData = this.excelService.getDataFromSheet(worksheet, ['test']);
 
     const distinctProjects = this.utilService.getDistinctData(excelData[0]);
+
+    console.log(excelData[0]);
 
     const distinctEmployees = this.utilService.getDistinctData(excelData[1]);
 
@@ -148,30 +170,11 @@ export class FileUploadComponent implements OnInit {
 
       }
 
-
-      // if (invalidProjects.indexOf(excelData[0][i]) !== -1
-      //   || invalidEmployees.indexOf(excelData[1][i]) !== -1
-      //   || !moment(excelData[2][i].v, moment.ISO_8601, true).isValid()
-      //   || isNaN(excelData[3][i])) {
-      //
-      //
-      //   worksheet[errorCellRef] = cell;
-      //
-      //   console.log('valid');
-      //
-      // } else {
-      //
-      //   console.log('Invalid');
-      //
-      //   console.log( isNaN(excelData[3][i]));
-      //
-      // }
-
       i++;
 
     });
 
-    XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
+    // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
     // this.nErrors = invalidData.length;
 
@@ -184,6 +187,8 @@ export class FileUploadComponent implements OnInit {
   onReadEnd(fileCount: number) {
     this.status = `Read ${fileCount} file(s) on ${new Date().toLocaleTimeString()}.`;
     this.filePicker.reset();
+
+    console.log(this.projects);
 
   }
 
@@ -225,19 +230,128 @@ export class FileUploadComponent implements OnInit {
   }
 
 
-
   addSubProjects(file: ReadFile) {
 
     const wb = this.excelService.getWorkSheet(file, 'TimeNode', 2);
 
     const worksheet = wb[0];
 
-    // let range = XLSX.utils.decode_range(worksheet['!ref']);
+    // const workBook = wb[1];
 
-    const excelData = this.excelService.getDataFromSheet(worksheet);
+    const workBook  = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workBook, worksheet, 'ImportData');
+
+    // const new workSheet =
+
+    const range = XLSX.utils.decode_range(worksheet['!ref']);
+
+    const newRange = {
+      s: {c: range.s.c, r: range.s.r},
+
+      e: {c: range.e.c, r: 800}
+    };
+
+    worksheet['!ref'] = XLSX.utils.encode_range(newRange);
 
 
-    console.log((excelData[0]));
+    const excelData = this.excelService.getProjectData(worksheet);
+
+
+    // excelData[2].map((p) => {
+    //
+    //   console.log(p.w);
+    //
+    // })
+
+
+    // const cellRef = XLSX.utils.encode_cell({c: excelData[4][1], r: 1});
+
+
+
+
+    const stages = ['1. Design / Pre-construction', '2. Cosntruction / Contract',
+      '3 Post PC / Close Out', 'Additional Work / Variations', 'Disbursements'];
+
+
+
+
+    let pCodeRow = 41;
+
+    const partialCodes = excelData[2].slice(37);
+
+    partialCodes.map((c) => {
+
+
+      for (let j = 0; j < stages.length; j++) {
+
+        const projectCodeCellRef = XLSX.utils.encode_cell({c: 0, r: pCodeRow});
+
+        // console.log(projectCodeCellRef);
+
+        const projectCodeCell = {t: '?', v: c[0].v};
+
+        worksheet[projectCodeCellRef] = projectCodeCell;
+
+        pCodeRow++;
+
+      }
+
+    });
+
+
+
+
+    let newRow = 41;
+
+    excelData[0].slice(37).map((d) => {
+
+      for (let j = 0; j < stages.length; j++) {
+
+        const subProjectCellRef = XLSX.utils.encode_cell({c: excelData[4][1], r: newRow});
+
+        const subProjectCell = {t: '?', v: stages[j]};
+
+        worksheet[subProjectCellRef] = subProjectCell;
+
+        newRow++;
+
+      }
+
+
+    });
+
+
+
+    let pRow = 41;
+
+    excelData[0].slice(37).map((p) => {
+
+      for (let j = 0; j < stages.length; j++) {
+
+        const projectCellRef = XLSX.utils.encode_cell({c: 1, r: pRow});
+
+        console.log(p[0]);
+
+        const projectCell = {t: '?', v: p[0]};
+
+        worksheet[projectCellRef] = projectCell;
+
+        pRow++;
+
+      }
+
+
+    });
+
+    XLSX.writeFile(workBook, 'TimeSheet-Test.xlsx');
+    //
+
+
+
+
+
+    // console.log((excelData));
 
 
   }
