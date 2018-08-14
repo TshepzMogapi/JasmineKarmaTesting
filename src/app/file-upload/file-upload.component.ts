@@ -3,6 +3,9 @@ import { FilePickerDirective, ReadFile, ReadMode } from 'ngx-file-helpers';
 
 import * as XLSX from 'xlsx';
 
+const Parse: any = require('parse');
+
+
 const { read, write, utils } = XLSX;
 
 import {DataService} from '../data.service';
@@ -29,6 +32,14 @@ export class FileUploadComponent implements OnInit {
   employees = [];
   projects = [];
 
+  subPs = [];
+
+  overHeads: any;
+
+  subOverHeads = [];
+
+  nodeTimes = [];
+
   nErrors = null;
 
   displayData = [];
@@ -41,37 +52,44 @@ export class FileUploadComponent implements OnInit {
 
   ngOnInit() {
 
-    const headers = ['project', 'employee'];
+    const headers = ['project', 'employee', 'startDay'];
 
-    const a = {};
+    const variables = {};
 
-    a['Variable'] = null;
+    for (let i = 0; i < headers.length; i++) {
 
-    console.log(a);
+      variables[headers[i] + 'Header'] = null;
+
+      variables[headers[i] + 'Ref'] = null;
+
+      variables[headers[i] + 'ColumnRef'] = null;
+
+      variables[headers[i] + 'Array'] = null;
+
+    }
+
+    this.overHeads = this.dataService.getOverHeads();
+
+    this.subOverHeads = this.dataService.getSubOverHeads();
 
 
-
-
-
-
-    // for (let i = 0; i < 2; i++) {
     //
-    //   console.log( eval(' alphabet' + i)  );
-    //   this['ref' + i] = 'test';
-    // }
 
-
+    //
+    this.subPs = this.dataService.getSubProjects();
+    //
+    //
+    // this.nodeTimes = this.dataService.getNodes();
 
 
     this.employees = this.dataService.getEmployees();
 
+
     this.projects = this.dataService.getProjects();
 
-    // this.projects.map((p) => {
-    //
-    //   console.log(p);
-    //
-    // });
+
+    // console.log(this.employees);
+
 
   }
 
@@ -91,15 +109,22 @@ export class FileUploadComponent implements OnInit {
 
     let range = XLSX.utils.decode_range(worksheet['!ref']);
 
-    const excelData = this.excelService.getDataFromSheet(worksheet, ['test']);
+    const hNames = ['Day', 'Employee', 'Project', 'SubProject' , 'Status', 'Hours'];
+
+    const excelData = this.excelService.getDataFromSheet(worksheet, hNames);
+
 
     const distinctProjects = this.utilService.getDistinctData(excelData[0]);
 
-    console.log(excelData[0]);
-
     const distinctEmployees = this.utilService.getDistinctData(excelData[1]);
 
+    // console.log(distinctProjects);
+
+
+
     const projectNames = this.utilService.getProjectNames(this.projects);
+
+    // console.log(projectNames);
 
     const employeeNames = this.utilService.getProjectNames(this.employees);
 
@@ -109,14 +134,8 @@ export class FileUploadComponent implements OnInit {
 
     const worksheetRange = excelData[3];
 
-    console.log(excelData[3]);
-    //
-    // excelData[2].map(ty => {
-    //   console.log(moment(ty.v, moment.ISO_8601, true).isValid());
-    // });
-
     const newRange = {
-      s: {c: range.s.c, r: range.s.r},
+      s: {c: range.s.c,   r: range.s.r},
       e: {c: range.e.c + 1, r: range.e.r}
     };
 
@@ -130,49 +149,60 @@ export class FileUploadComponent implements OnInit {
 
     const address = XLSX.utils.decode_cell(cellRef);
 
+    // console.log(this.utilService.isDateValid(excelData[2][0].v));
+
+
+    // console.log(excelData[6][2]);
+
     // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
-    let i = 0;
+    // let i = 0;
 
-    (excelData[4][2]).map(d => {
+    // report errors
 
-
-      // if -1 is valid
-      const errorCellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: excelData[4][2][i]});
-
-      let errorText = '';
-
-      // const cell = {t: '?', v: 'Invalid record'};
-
-      if (invalidProjects.indexOf(excelData[0][i]) !== -1) {
-        errorText += ' Invalid Project Name ';
-      }
-
-      if (invalidEmployees.indexOf(excelData[0][i]) !== -1) {
-        errorText += ' Invalid Employee Name ';
-      }
-
-      if (!moment(excelData[2][i].v, moment.ISO_8601, true).isValid()) {
-        errorText += ' Invalid Date ';
-      }
-
-
-      if (isNaN(excelData[3][i])) {
-        errorText += ' Invalid Hours ';
-      }
-
-      if (errorText.length > 0) {
-
-        const cell = {t: '?', v: errorText};
-
-        worksheet[errorCellRef] = cell;
-
-
-      }
-
-      i++;
-
-    });
+    // (excelData[6][2]).map(d => {
+    //
+    //
+    //   // excelData = [projects, employees, dates, hours, isOverHead, subProjects, [headerRowRef, range.e.c, recordsRowRef]];
+    //
+    //   // if -1 is valid
+    //   const errorCellRef = XLSX.utils.encode_cell({c: worksheetRange[1] + 1, r: excelData[4][2][i]});
+    //
+    //   let errorText = '';
+    //
+    //   // const cell = {t: '?', v: 'Invalid record'};
+    //
+    //   if (invalidProjects.indexOf(excelData[0][i]) !== -1) {
+    //     errorText += ' Invalid Project Name ';
+    //   }
+    //
+    //   if (invalidEmployees.indexOf(excelData[1][i]) !== -1) {
+    //     errorText += ' Invalid Employee Name ';
+    //   }
+    //
+    //   if (!moment(excelData[2][i].v, moment.ISO_8601, true).isValid()) {
+    //     errorText += ' Invalid Date ';
+    //   }
+    //
+    //
+    //   if (isNaN(excelData[3][i])) {
+    //     errorText += ' Invalid Hours ';
+    //   }
+    //
+    //   if (errorText.length > 0) {
+    //
+    //     const cell = {t: '?', v: errorText};
+    //
+    //     console.log(errorText);
+    //
+    //     // worksheet[errorCellRef] = cell;
+    //
+    //
+    //   }
+    //
+    //   i++;
+    //
+    // });
 
     // XLSX.writeFile(wb[1], 'TimeSheet-Test.xlsx');
 
@@ -188,7 +218,25 @@ export class FileUploadComponent implements OnInit {
     this.status = `Read ${fileCount} file(s) on ${new Date().toLocaleTimeString()}.`;
     this.filePicker.reset();
 
-    console.log(this.projects);
+  }
+
+  testAfter() {
+
+    console.log(this.subOverHeads);
+
+    const OverHeads = Parse.Object.extend('Overhead');
+
+    const query = new Parse.Query(OverHeads);
+
+    query.doesNotExist('company');
+
+
+    // query.find().then((r) => {
+    //   console.log(r.length);
+    // });
+    //
+    // console.log('Tests');
+
 
   }
 
@@ -221,6 +269,8 @@ export class FileUploadComponent implements OnInit {
 
 
   getDistinctData(originalData: any[]): any[] {
+
+  // .toLowerCase().replace(/\s/g, '')
 
     let uniqueData = [];
 

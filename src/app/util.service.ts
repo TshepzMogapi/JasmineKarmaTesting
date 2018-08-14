@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 
 import {DataService} from './data.service';
 
+import {moment} from 'ngx-bootstrap/chronos/test/chain';
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -33,6 +36,8 @@ export class UtilService {
 
     const projectsNames = [];
 
+
+
     projects.map((p) => {
 
       projectsNames.push(p.name);
@@ -41,6 +46,26 @@ export class UtilService {
 
     return projectsNames;
   }
+
+  isDateValid(date: string): boolean {
+
+    const isDate = moment(date, moment.ISO_8601, true).isValid();
+
+    return isDate;
+  }
+
+  isNumber(number: string): boolean {
+
+
+    return false;
+  }
+
+  tagRecords(databaseRecords: any[], recordsToCheck: any[]) {
+
+
+  }
+
+
 
 
 }

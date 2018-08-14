@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 import { FilePickerDirective, ReadFile, ReadMode } from 'ngx-file-helpers';
 
 
+
+
 import * as XLSX from 'xlsx';
 
 
@@ -11,9 +13,6 @@ import * as XLSX from 'xlsx';
   providedIn: 'root'
 })
 export class XLSXService {
-
-  employees = [];
-  projects = [];
 
   constructor() { }
 
@@ -34,13 +33,11 @@ export class XLSXService {
 
   }
 
-  getDataFromSheet(workSheet: any, headerNames: string[]): [any[], any[], any[], any[], any[]] {
+  getDataFromSheet(workSheet: any, headerNames: string[]): [any[], any[], any[], any[], any[], any[], any[]] {
 
     const range = XLSX.utils.decode_range(workSheet['!ref']);
 
     const r = range;
-
-
 
     const headers = ['project', 'employee', 'startDay'];
 
@@ -48,20 +45,22 @@ export class XLSXService {
 
     for (let i = 0; i < headers.length; i++) {
 
+      variables[headers[i] + 'Header'] = null;
+
     }
-
-    variables['Variable'] = null;
-
-    
 
 
     const projectHeader = 'Project';
 
-    const startDayHeader = 'Day';
+    const startDayHeader = 'WeekStart (Sunday)';
 
     const employeeHeader = 'Employee';
 
     const hoursHeader = 'Hours';
+
+    const subProjectHeader = 'SubProject';
+
+    const isOverHeadHeader = 'Overhead';
 
     const cell = {t: '?', v: 'NEW VALUE'};
 
@@ -73,7 +72,12 @@ export class XLSXService {
 
     let hoursRef = null;
 
+    let subProjectRef = null;
+
+    let isOverHeadRef = null;
+
     let isHeaderPresent = null;
+
 
     let dateColumnRef = null;
 
@@ -83,6 +87,14 @@ export class XLSXService {
 
     let hoursColumnRef = null;
 
+    let subProjectColumnRef = null;
+
+    let isOverHeadColumnRef = null;
+
+
+
+
+
     const dates = [];
 
     const employees = [];
@@ -90,6 +102,11 @@ export class XLSXService {
     const projects = [];
 
     const hours = [];
+
+    const isOverHead = [];
+
+    const subProjects = [];
+
 
     let headerRowRef = null;
 
@@ -107,7 +124,8 @@ export class XLSXService {
         if (workSheet[cellRef]) {
 
           if (dateRef && employeeRef
-            && projectRef && hoursRef) {
+            && projectRef && hoursRef
+            && isOverHeadRef && subProjectRef ) {
 
             isHeaderPresent = true;
 
@@ -147,6 +165,22 @@ export class XLSXService {
 
           }
 
+          if (workSheet[cellRef].v === subProjectHeader) {
+
+            subProjectRef = cellRef;
+
+            subProjectColumnRef = C;
+
+          }
+
+          if (workSheet[cellRef].v === isOverHeadHeader) {
+
+            isOverHeadRef = cellRef;
+
+            isOverHeadColumnRef = C;
+
+          }
+
           if (isHeaderPresent) {
 
             if (C === dateColumnRef) {
@@ -174,6 +208,17 @@ export class XLSXService {
 
             }
 
+            if (C === isOverHeadColumnRef) {
+
+              isOverHead.push(workSheet[cellRef].v);
+
+            }
+
+            if (C === subProjectColumnRef) {
+
+              subProjects.push(workSheet[cellRef].v);
+
+            }
 
           }
 
@@ -181,15 +226,11 @@ export class XLSXService {
 
       }
     }
+// todo modify below
+    return [projects, employees, dates, hours, isOverHead, subProjects, [headerRowRef, range.e.c, recordsRowRef]];
 
+  }
 
-
-    // todo modify below
-    return [projects, employees, dates, hours, [headerRowRef, range.e.c, recordsRowRef]];
-
-}
-
-  // classifyRecords()
 
   findKeywordIndex(keyWord: string, worksheet: object): number {
 
@@ -360,5 +401,7 @@ export class XLSXService {
     return [projects, managers, codes, subProjects, [headerRowRef, subProjectsColumnRef, recordsRowRef]];
 
   }
+
+
 
 }
